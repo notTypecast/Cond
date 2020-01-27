@@ -75,14 +75,22 @@ class Cond:
 
 		#if range keyword was provided, add the specified range to __VALS
 		if "range" in kwargs:
-			if type(kwargs["range"]) is int or len(kwargs["range"]) == 1:
+			if type(kwargs["range"]) is int and kwargs["range"] <= 0:
+				raise ValueError("Cond: bad keyword argument \"range\"")
+			elif type(kwargs["range"]) is int:
+				kwargs["range"] = (kwargs["range"],)
+
+			if len(kwargs["range"]) == 1:
 				self.__VALS.extend(range(kwargs["range"][0]))
 			elif len(kwargs["range"]) == 2:
 				self.__VALS.extend(range(kwargs["range"][0], kwargs["range"][1]))
 			else:
 				self.__VALS.extend(range(kwargs["range"][0], kwargs["range"][1], kwargs["range"][2]))
 
-		self.__VALS.extend(args)
+		for arg in args:
+			if arg not in self.__VALS:
+				self.__VALS.append(arg)
+
 		if self.__MAINPOS >= len(self.__VALS):
 			raise ValueError("Cond: keyword argument \"mainpos\" out of range")
 
@@ -301,102 +309,162 @@ class Cond:
 
 	def __iadd__(self, other):
 		if type(other) is type(self):
-			self.__MAIN += other.__MAIN
-			return self
+			result = self.__MAIN + other.__MAIN
 		else:
-			self.__MAIN += other
-			return self
+			result = self.__MAIN + other
+
+		if not type(result) is self.__TYPE:
+			raise TypeChangeError("Cond: operation would change main option type")
+
+		self.__MAIN = result		
+		self.__VALS[self.__MAINPOS] = self.__MAIN
+		return self
 
 	def __isub__(self, other):
 		if type(other) is type(self):
-			self.__MAIN -= other.__MAIN
-			return self
+			result = self.__MAIN - other.__MAIN
 		else:
-			self.__MAIN -= other
-			return self
+			result = self.__MAIN - other
+
+		if not type(result) is self.__TYPE:
+			raise TypeChangeError("Cond: operation would change main option type")
+
+		self.__MAIN = result		
+		self.__VALS[self.__MAINPOS] = self.__MAIN
+		return self
 
 	def __imul__(self, other):
 		if type(other) is type(self):
-			self.__MAIN *= other.__MAIN
-			return self
+			result = self.__MAIN * other.__MAIN
 		else:
-			self.__MAIN *= other
-			return self
+			result = self.__MAIN * other
+
+		if not type(result) is self.__TYPE:
+			raise TypeChangeError("Cond: operation would change main option type")
+
+		self.__MAIN = result		
+		self.__VALS[self.__MAINPOS] = self.__MAIN
+		return self
 
 	def __ifloordiv__(self, other):
 		if type(other) is type(self):
-			self.__MAIN //= other.__MAIN
-			return self
+			result = self.__MAIN // other.__MAIN
 		else:
-			self.__MAIN //= other
-			return self
+			result = self.__MAIN // other
 
-	def __idiv__(self, other):
+		if not type(result) is self.__TYPE:
+			raise TypeChangeError("Cond: operation would change main option type")
+
+		self.__MAIN = result		
+		self.__VALS[self.__MAINPOS] = self.__MAIN
+		return self
+
+	def __itruediv__(self, other):
 		if type(other) is type(self):
-			self.__MAIN /= other.__MAIN
-			return self
+			result = self.__MAIN / other.__MAIN
 		else:
-			self.__MAIN /= other
-			return self
+			result = self.__MAIN / other
+
+		if not type(result) is self.__TYPE:
+			raise TypeChangeError("Cond: operation would change main option type")
+
+		self.__MAIN = result		
+		self.__VALS[self.__MAINPOS] = self.__MAIN
+		return self
 
 
 	def __imod__(self, other):
 		if type(other) is type(self):
-			self.__MAIN %= other.__MAIN
-			return self
+			result = self.__MAIN % other.__MAIN
 		else:
-			self.__MAIN %= other
-			return self
+			result = self.__MAIN % other
+
+		if not type(result) is self.__TYPE:
+			raise TypeChangeError("Cond: operation would change main option type")
+
+		self.__MAIN = result		
+		self.__VALS[self.__MAINPOS] = self.__MAIN
+		return self
 
 
 	def __ipow__(self, other):
 		if type(other) is type(self):
-			self.__MAIN **= other.__MAIN
-			return self
+			result = self.__MAIN ** other.__MAIN
 		else:
-			self.__MAIN **= other
-			return self
+			result = self.__MAIN ** other
+
+		if not type(result) is self.__TYPE:
+			raise TypeChangeError("Cond: operation would change main option type")
+
+		self.__MAIN = result		
+		self.__VALS[self.__MAINPOS] = self.__MAIN
+		return selff
 
 	def __ilshift__(self, other):
 		if type(other) is type(self):
-			self.__MAIN <<= other.__MAIN
-			return self
+			result = self.__MAIN << other.__MAIN
 		else:
-			self.__MAIN <<= other
-			return self
+			result = self.__MAIN << other
+
+		if not type(result) is self.__TYPE:
+			raise TypeChangeError("Cond: operation would change main option type")
+
+		self.__MAIN = result		
+		self.__VALS[self.__MAINPOS] = self.__MAIN
+		return self
 
 	def __irshift__(self, other):
 		if type(other) is type(self):
-			self.__MAIN >>= other.__MAIN
-			return self
+			result = self.__MAIN >> other.__MAIN
 		else:
-			self.__MAIN >>= other
-			return self
+			result = self.__MAIN >> other
+
+		if not type(result) is self.__TYPE:
+			raise TypeChangeError("Cond: operation would change main option type")
+
+		self.__MAIN = result		
+		self.__VALS[self.__MAINPOS] = self.__MAIN
+		return self
 
 
 	def __iand__(self, other):
 		if type(other) is type(self):
-			self.__MAIN &= other.__MAIN
-			return self
+			result = self.__MAIN & other.__MAIN
 		else:
-			self.__MAIN &= other
-			return self
+			result = self.__MAIN & other
+
+		if not type(result) is self.__TYPE:
+			raise TypeChangeError("Cond: operation would change main option type")
+
+		self.__MAIN = result		
+		self.__VALS[self.__MAINPOS] = self.__MAIN
+		return self
 
 	def __ior__(self, other):
 		if type(other) is type(self):
-			self.__MAIN |= other.__MAIN
-			return self
+			result = self.__MAIN | other.__MAIN
 		else:
-			self.__MAIN |= other
-			return self
+			result = self.__MAIN | other
+
+		if not type(result) is self.__TYPE:
+			raise TypeChangeError("Cond: operation would change main option type")
+
+		self.__MAIN = result		
+		self.__VALS[self.__MAINPOS] = self.__MAIN
+		return self
 
 	def __ixor__(self, other):
 		if type(other) is type(self):
-			self.__MAIN ^= other.__MAIN
-			return self
+			result = self.__MAIN ^ other.__MAIN
 		else:
-			self.__MAIN ^= other
-			return self
+			result = self.__MAIN ^ other
+
+		if not type(result) is self.__TYPE:
+			raise TypeChangeError("Cond: operation would change main option type")
+
+		self.__MAIN = result		
+		self.__VALS[self.__MAINPOS] = self.__MAIN
+		return self
 
 	def __int__(self):
 		return int(self.__MAIN)
@@ -621,7 +689,7 @@ def _interpretExpression(expression, cond_obj_amount):
 			return None
 
 		#if number is followed by letter or letter is followed by letter, multiplication is implied
-		if i != len(expression) - 1 and ((expression[i].isdigit() and expression[i + 1].isalpha()) or (expression[i].isalpha() and (expression[i + 1].isalpha() or expression[i + 1].isdigit() or expression[i + 1] == "("))):
+		if i != len(expression) - 1 and ((expression[i].isdigit() and (expression[i + 1].isalpha() or expression[i + 1] == "(")) or (expression[i].isalpha() and (expression[i + 1].isalpha() or expression[i + 1].isdigit() or expression[i + 1] == "("))):
 			n_expression += "*"
 
 	formula = expr(n_expression).compile()
@@ -667,7 +735,11 @@ def _testEquation(formula, variables_to_cond, max_recursion_level, recursion_lev
 			for variable in numbers:
 				exec("{} = {}".format(variable, numbers[variable]))
 			#calculate the expression result
-			equation_result = eval(formula)
+			try:
+				equation_result = eval(formula)
+			#if ZeroDivisionError, then combination of numbers cannot be right
+			except ZeroDivisionError:
+				return None
 			#if the result satisfies the evaluation, return the indexes
 			if _MainData.evaluation_signs[eval_sign](equation_result, eval_num):
 				return indexes
@@ -684,7 +756,8 @@ def _testEquation(formula, variables_to_cond, max_recursion_level, recursion_lev
 
 
 
-
+class TypeChangeError(Exception):
+	pass
 
 
 
