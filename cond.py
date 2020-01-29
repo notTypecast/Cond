@@ -580,7 +580,7 @@ PRIVATE
 Stores values that are reused by functions so they aren't constantly allocated and freed
 '''
 class _MainData:
-	evaluation_signs = {"=": operator.eq, ">": operator.gt, ">=": operator.ge, "<": operator.lt, "<=": operator.le}
+	evaluation_signs = {"=": operator.eq, ">": operator.gt, ">=": operator.ge, "<": operator.lt, "<=": operator.le, "!=": operator.ne}
 	operation_signs = {"+", "-", "*", "/", "%", "^"}
 	accepted_characters = set(ascii_uppercase + ascii_lowercase + digits) | operation_signs | {" ", "(", ")"}
 
@@ -596,8 +596,9 @@ def require(expression, cond_objects, eval_sign, eval_num):
 	every variable that is part of the expression must be single-letter; it corresponds to exactly one Cond object
 	-> cond_objects: the Cond objects to replace the variables in the expression with; can be tuple of Conds or simply Cond
 	must include exactly the same amount of arguments as variables in the expression
-	->eval_sign: evaluation sign to be used; must be =, >, >=, <, <=
-	->eval_num: evaluation number to be used; can be any numeric type or Cond, but not expression
+	->eval_sign: evaluation sign to be used; must be =, >, >=, <, <=, !=
+	->eval_num: evaluation number to be used; can be any numeric type or Cond, but not expression; 
+	for != sign, multiple eval nums can be passed as a type tuple
 
 	The require function will go through all combinations for the options of all involved Cond objects and attempt to find
 	a combination, which satisfies the equation; if such options are found, the main option(s) of the Cond object(s) passed
@@ -609,7 +610,7 @@ def require(expression, cond_objects, eval_sign, eval_num):
 	if eval_sign not in _MainData.evaluation_signs.keys():
 		raise ValueError("require(): bad evaluation sign")
 	#if evaluation number is of incorrect type
-	elif type(eval_num) not in {Cond, int, float, complex}:
+	elif type(eval_num) not in {Cond, int, float, complex, tuple}:
 		raise TypeError("require(): bad evaluation number")
 	#if cond_objects is of incorrect type
 	elif type(cond_objects) not in {tuple, Cond}:
@@ -617,6 +618,12 @@ def require(expression, cond_objects, eval_sign, eval_num):
 
 	if type(cond_objects) is Cond:
 		cond_objects = (cond_objects,)
+
+	if type(eval_num) is not tuple:
+		eval_num = (eval_num,)
+
+	if len(eval_num) != 1 and eval_sign != "!=":
+		raise ValueError("require(): expected single eval_num, but got multiple")
 
 	#interpret expression given by user
 	formula = _interpretExpression(expression, len(cond_objects))
@@ -634,12 +641,8 @@ def require(expression, cond_objects, eval_sign, eval_num):
 			variables_found.append(c)
 
 	#if number of variables is different than number of Cond objects, throw error
-	if type(cond_objects) is Cond:
-		if total_variables != 1:
-			raise ValueError("require(): passed single Cond object, but had more than 1 variable in expression")
-	else:
-		if total_variables != len(cond_objects):
-			raise ValueError("require(): number of Cond objects passed was different than number of variables in expression")
+	if total_variables != len(cond_objects):
+		raise ValueError("require(): number of Cond objects passed was different than number of individual variables in expression")
 
 	#map single-letter variables to corresponding Cond objects
 	variables_to_cond = {}
@@ -708,7 +711,7 @@ recursion_level -> current recursion level, reduced by one every recursive call 
 numbers -> dict mapping the single_letter variables to the value that they will be tested as
 indexes -> dict mapping the Cond objects to the index of the current option, so it can be returned if the option combination satisfies the equation
 eval_sign -> the evaluation sign
-eval_num -> the evaluation number
+eval_num -> the evaluation number(s)
 '''
 def _testEquation(formula, variables_to_cond, max_recursion_level, recursion_level, numbers, indexes, eval_sign, eval_num):
 
@@ -740,8 +743,14 @@ def _testEquation(formula, variables_to_cond, max_recursion_level, recursion_lev
 			#if ZeroDivisionError, then combination of numbers cannot be right
 			except ZeroDivisionError:
 				return None
-			#if the result satisfies the evaluation, return the indexes
-			if _MainData.evaluation_signs[eval_sign](equation_result, eval_num):
+			#if the result satisfies all evaluations (with all given eval_nums), return the indexes
+			satisfies = True
+			for num in eval_num:
+				if not _MainData.evaluation_signs[eval_sign](equation_result, num):
+					satisfies = False
+					break
+
+			if satisfies:
 				return indexes
 
 		else:

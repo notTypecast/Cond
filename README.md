@@ -1,6 +1,6 @@
 # Cond - Numeric data type  
 
-**Cond** is a custom numeric data type for Python 3. It supports most operations that are legal on a regular data type, while adding some new properties.  
+**Cond** is a custom numeric data type for Python 3. It supports most operations that are legal on a regular data type, while adding some new properties. It can be installed using `pip3 install cond`.  
 
 ***The idea***  
 
@@ -107,8 +107,8 @@ Main x option: -8
 As mentioned above, the require function is the function which applies "limitations" to Cond objects and changes their main options, based on those limitations. In reality, the require function does nothing more than brute-forcing solutions until it potentially gets a correct one. More specifically, the syntax is: `require(expression, cond_objects, eval_sign, eval_number)`. Following is the explanation for each of these arguments.
 * expression: the expression is actually a string representation of an algebraic expression. In essence, it is the "left part" of the equation. Each Cond object that is part of the expression must be represented with a single-digit letter. Just as in regular Python, addition is represented by the "+" symbol, subtraction by the "-" symbol, multiplication by the "\*" symbol, division by the "\\" symbol and modulo by the "%" symbol. Contrary to how it works in regular Python, exponentiation is represented by the "^" symbol (though "\*\*" can also be used). In addition to this, the multiplication symbol can be skipped in cases where algebra allows it (between single-letter variables, numbers or variables followed by parenthesis, numbers followed by variables, etc).
 * cond_objects: this argument can either be a single Cond object, or a tuple containing multiple of them. However, the amount of Cond objects passed through this argument must be exactly equal to the amount of variables that the expression contains. The correspondence between variables and Cond objects is 1-1, meaning the first variable is paired with the first object, the second with the second, and so on. This means that, if the expression was `"x - y"` and the tuple was `(y, x)`, the actual operation that the function would attempt to satisfy would be `y - x` and not `x - y`, because the object y was written first, so it corresponds to the first available variable, x. In essence, variable names inside the expression are no more than conventions -they don't represent any actual variable names.
-* eval_sign: this argument is a string of the evaluation sign. This can be either one of: "=", ">", ">=", "<", "<=".
-* eval_number: this argument is a numeric value, representing the "right side" of the equation. This can be any built-in numeric value, or it can be of type Cond. However, note that if type Cond is used, it will not be edited in any way. It will simply be used for its value and not take part in the actual expression.
+* eval_sign: this argument is a string of the evaluation sign. This can be either one of: "=", ">", ">=", "<", "<=", "!-".
+* eval_number: this argument is a numeric value, representing the "right side" of the equation. This can be any built-in numeric value, or it can be of type Cond. However, note that if type Cond is used, it will not be edited in any way. It will simply be used for its value and not take part in the actual expression. An expression cannot be used for this argument, therefore any equation should be solved so that there is only a single numeric value on the right side of it before using the function. This argument can also be a tuple of multiple numeric types, but only if the eval_sign argument is "!=".
 The full equation can be recreated by substituting the variable names with the Cond object names, with the correct correlation and then appending the sign and the evaluation number at the end.
 The require function will return `True` if any combination of existing options for each included Cond object is found, which satisfies the given equation and will change the main value of the object to that which was found. If no combination of values that satisfy the equation are found, `False` is returned and no changes are made onto the Cond objects.
 Following are some examples of the require function's use.
@@ -154,14 +154,6 @@ In this example, no combination is found that satisfies the expression. Therefor
 ```
 In this example, notice that x is not passed twice. Even though the variable a appears twice before the variable b, once the object x is mapped to the variable a, whenever a is found again, it is dismissed. Therefore, it is safe to pass y afterwards, so it is mapped to b, without worrying about passing x twice.
 *Note: passing x twice would actually cause an error*  
-
-***Future additions***  
-
-A not-equals sign is planned for the `eval_sign`.  
-
-Must test behavior for when same Cond object is passed more than once inside a single expression more extensively.  
-
-Further bug testing.
 
 ***Credit***  
 
