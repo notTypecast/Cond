@@ -401,7 +401,7 @@ class Cond:
 
 		self.__MAIN = result		
 		self.__VALS[self.__MAINPOS] = self.__MAIN
-		return selff
+		return self
 
 	def __ilshift__(self, other):
 		if type(other) is type(self):
