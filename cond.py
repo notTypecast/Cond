@@ -21,7 +21,6 @@ class Cond:
 	Using the append() method on a Cond object will add a new option to that object, so long it doesn't already exist
 	Using the remove() method on a Cond object will remove an existing option from that object, so long it isn't the main option
 	Using the index(value) method on a Cond object will return an integer representing the index of that value in the Cond object's options
-
 	Cond objects can be passed to the require function, which will edit their main option based on the given expression
 	The require function cannot affect the options of a Cond object, it can only change its main option to a different one from
 	the available options
@@ -686,12 +685,10 @@ def require(expression, cond_objects, eval_sign, eval_num):
 	->eval_sign: evaluation sign to be used; must be =, >, >=, <, <=, !=
 	->eval_num: evaluation number to be used; can be any numeric type or Cond, but not expression; 
 	for != sign, multiple eval nums can be passed as a type tuple
-
 	The require function will go through all combinations for the options of all involved Cond objects and attempt to find
 	a combination, which satisfies the equation; if such options are found, the main option(s) of the Cond object(s) passed
 	will be changed to those new options and True will be returned; otherwise, the Cond objects will not be changed in any way
 	and False will be returned
-
 	Similarly, for LinkedCond objects, all combinations which satisfy each limitation will be found; then, the "intersection" will
 	be found (meaning a combination to satisfy all limitations); if such a combination exists, the main option(s) of all LinkedCond
 	objects involved will be set to those; NOTE: LinkedCond objects, since they are linked, can be changed indirectly (refer to README)
@@ -812,6 +809,8 @@ def require(expression, cond_objects, eval_sign, eval_num):
 	#if None was returned, no combination was found
 	if not resulting_combinations:
 		return False
+
+	result = resulting_combinations
 
 	#if dict was returned, it contains IDs of objects and corresponding indexes
 	#so for each Cond object, set their main option to given index
@@ -1008,7 +1007,7 @@ def _findCombination(formula, variables_to_cond, max_recursion_level, recursion_
 				return result
 
 	#if recursion level is max, it means all calls ended, so return the combination set
-	if recursion_level == max_recursion_level:
+	if recursion_level == max_recursion_level and combination_set:
 		return _convertToListOfDicts(combination_set)
 
 	#if recursion level isn't max but indexes haven't been returned, return None (either no combination was found, or it was added to set)
@@ -1048,8 +1047,3 @@ to float from int, so it is not possible
 '''
 class TypeChangeError(Exception):
 	pass
-
-
-
-
-
