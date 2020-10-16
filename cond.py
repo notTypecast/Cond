@@ -602,7 +602,7 @@ class LinkedCond(Cond):
 		return list(self.__LIMS)
 
 	def clearlims(self):
-		for limitation in self.__LIMS:
+		for limitation in list(self.__LIMS):
 			for linked_cond in limitation[1]:
 				linked_cond.__LIMS.remove(limitation)
 
