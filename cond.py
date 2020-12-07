@@ -772,7 +772,13 @@ def require(expression, cond_objects, eval_sign, eval_num):
 			for limitation in cond_object._getLimsRepr():
 
 				#check if limitation hasn't already been satisfied
-				if limitation not in satisfied_limitations:
+				isSatisfied = False
+				for l in satisfied_limitations:
+					if _limEquals(l, limitation):
+						isSatisfied = True
+						break
+
+				if not isSatisfied:
 					#interpret the limitation as a formula
 					lim_formula = _interpretExpression(limitation[0], len(limitation[1]))
 					#map variables of limitation expression to corresponding Cond objects
@@ -803,8 +809,7 @@ def require(expression, cond_objects, eval_sign, eval_num):
 		if first_lim:
 			resulting_combinations = result
 		else:
-			resulting_combinations = _updateResultingCombinations(resulting_combinations, result)
-			
+			resulting_combinations = _updateResultingCombinations(resulting_combinations, result)			
 
 	#if None was returned, no combination was found
 	if not resulting_combinations:
@@ -1038,6 +1043,37 @@ def _testEquation(formula, numbers, eval_sign, eval_num):
 			break
 
 	return satisfies
+'''
+PRIVATE
+returns true if the two passed limitations are equal
+'''
+def _limEquals(lim1, lim2):
+	if lim1[0] != lim2[0]:
+		return False
+
+	if len(lim1[1]) != len(lim2[1]):
+		return False
+
+	if lim1[2] != lim2[2]:
+		return False
+
+	if len(lim1[3]) != len(lim2[3]):
+		return False
+
+	i = 0
+	while i < len(lim1[1]):
+		if lim1[i] is not lim2[i]:
+			return False
+		i += 1
+
+	i = 0
+	while i < len(lim1[3]):
+		if lim1[i] != lim2[i]:
+			return False
+		i += 1
+
+	return True
+
 
 '''
 PRIVATE
